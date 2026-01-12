@@ -12,7 +12,7 @@ env:
   PACKAGE_NAME: pins-linux-x64
   DEB_ROOT: artifacts/debroot
   DEB_PACKAGE: pins
-  DEB_ARCH: amd64
+  DEB_ARCH: i386
   PLUGINS_INSTALL_BASE: /home/pi/.local/share/NINA/Plugins/3.0.0
   PLUGIN_DEB_BASE: artifacts/plugin-debroot
   PLUGIN_ARTIFACT_DIR: artifacts/plugins
@@ -78,7 +78,7 @@ jobs:
             exit 1
           fi
           
-          # Copy linux-x64 to linux-x64 before copying
+          # Copy linux-x64 to linux-amd64 before copying
           if [ -d "$unzip_dir/external/linux-x64" ]; then
             cp -r "$unzip_dir/external/linux-x64" "$unzip_dir/external/linux-amd64"
             echo "Copied linux-x64 to linux-amd64"
@@ -211,7 +211,7 @@ jobs:
       - name: Upload Raspberry Pi package
         uses: actions/upload-artifact@v4
         with:
-          name: linux-amd64-package
+          name: linux-x64-package
           path: |
             artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}_${{ steps.release_tag.outputs.date }}.deb
             artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}_${{ steps.release_tag.outputs.date }}.deb.sha256

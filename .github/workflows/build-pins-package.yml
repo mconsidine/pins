@@ -1,18 +1,18 @@
-name: Build Linux ARM64 Package
+name: Build Linux x64 Package
 
 on:
   workflow_dispatch:
 
 env:
   BUILD_CONFIGURATION: Release
-  TARGET_RUNTIME: linux-arm64
+  TARGET_RUNTIME: linux-x64
   INSTALL_DIRECTORY: /home/pi/pins
   PUBLISH_DIRECTORY: artifacts/publish
   PACKAGE_ROOT: artifacts/package
-  PACKAGE_NAME: pins-linux-arm64
+  PACKAGE_NAME: pins-linux-x64
   DEB_ROOT: artifacts/debroot
   DEB_PACKAGE: pins
-  DEB_ARCH: arm64
+  DEB_ARCH: x64
   PLUGINS_INSTALL_BASE: /home/pi/.local/share/NINA/Plugins/3.0.0
   PLUGIN_DEB_BASE: artifacts/plugin-debroot
   PLUGIN_ARTIFACT_DIR: artifacts/plugins
@@ -20,8 +20,8 @@ env:
   PLUGIN_FAILURES_FILE: artifacts/plugin-build-failures.log
 
 jobs:
-  build-linux-arm64:
-    name: Build Raspberry Pi package and plugin debs
+  build-linux-x64:
+    name: Build x64 package and plugin debs
     runs-on: ubuntu-latest
 
     steps:
@@ -91,7 +91,7 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Restore linux-arm64 dependencies
+      - name: Restore linux-x64 dependencies
         run: |
           dotnet restore NINA/NINA.csproj -r ${{ env.TARGET_RUNTIME }}
           dotnet restore System.Windows.Compat/System.Windows.Compat.csproj
@@ -99,10 +99,10 @@ jobs:
       - name: Build System.Windows.Compat
         run: dotnet build System.Windows.Compat/System.Windows.Compat.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-restore
 
-      - name: Build linux-arm64 binaries
+      - name: Build linux-x64 binaries
         run: dotnet build NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r ${{ env.TARGET_RUNTIME }} --no-restore
 
-      - name: Publish linux-arm64 payload
+      - name: Publish linux-x64 payload
         run: dotnet publish NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r ${{ env.TARGET_RUNTIME }} --no-build -o ${{ env.PUBLISH_DIRECTORY }}/${{ env.TARGET_RUNTIME }}
 
       - name: Determine package version
@@ -202,7 +202,7 @@ jobs:
       - name: Upload Raspberry Pi package
         uses: actions/upload-artifact@v4
         with:
-          name: linux-arm64-package
+          name: linux-x64-package
           path: |
             artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}_${{ steps.release_tag.outputs.date }}.deb
             artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}_${{ steps.release_tag.outputs.date }}.deb.sha256

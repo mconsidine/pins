@@ -202,11 +202,11 @@ jobs:
             echo "Installed-Size: $installed_size"
             echo "Description: Pins build for Raspberry Pi"
           } > "$control_dir/control"
-          dpkg-deb --build "$deb_root" "artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env. }}_${{ steps.release_tag.outputs.date }}.deb"
+          dpkg-deb --build "$deb_root" "artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}"_${{ steps.release_tag.outputs.date }}.deb"
 
       - name: Generate SHA256 checksums
         run: |
-          sha256sum "artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env. }}_${{ steps.release_tag.outputs.date }}.deb" > "artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env. }}_${{ steps.release_tag.outputs.date }}.deb.sha256"
+          sha256sum "artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}"_${{ steps.release_tag.outputs.date }}.deb" > "artifacts/${{ env.DEB_PACKAGE }}_${{ steps.version.outputs.package_version }}_${{ env.DEB_ARCH }}"_${{ steps.release_tag.outputs.date }}.deb.sha256"
 
       - name: Upload Raspberry Pi package
         uses: actions/upload-artifact@v4

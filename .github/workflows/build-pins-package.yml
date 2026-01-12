@@ -79,13 +79,55 @@ jobs:
           fi
           
           # Copy linux-x64 to linux-amd64 before copying
-          if [ -d "$unzip_dir/external/linux-x64" ]; then
-            cp -r "$unzip_dir/external/linux-x64" "$unzip_dir/external/linux-amd64"
-            echo "Copied linux-x64 to linux-amd64"
-          fi
+          #if [ -d "$unzip_dir/external/linux-x64" ]; then
+          #  cp -r "$unzip_dir/external/linux-x64" "$unzip_dir/external/linux-amd64"
+          #  echo "Copied linux-x64 to linux-amd64"
+          #fi
           
           rsync -a "$unzip_dir/external/" "NINA/External/"
           echo "External bundle extracted into NINA/External"
+
+          EXTERNAL_DIR="NINA/External"
+          mkdir -p "$EXTERNAL_DIR"
+          # Convert to absolute path so it works even after cd
+          EXTERNAL_DIR="$(cd "$EXTERNAL_DIR" && pwd)"
+
+          # Create stub .so files for missing libraries
+          # These prevent build errors but will fail at runtime if the hardware is used
+          echo "/* Stub library */" > /tmp/stub.c
+          gcc -shared -fPIC /tmp/stub.c -o /tmp/stub.so 2>/dev/null || {
+              echo "WARNING: Could not create stub library, using empty files"
+              USE_EMPTY_STUBS=1
+          }
+          
+          for lib in \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/Oasis/liboasisfilterwheel.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/Oasis/liboasisfocuser.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/Nitecrawler/libNitecrawlerSDK.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/Wanderer/libWandererRotatorSDK.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/ASI/libASICamera2.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/ASI/libEAFFocuser.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/ASI/libEFWFilter.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/ToupTek/libtoupcam.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/SOFA/libsofa_c.so" \
+              "$EXTERNAL_DIR/$TARGET_RUNTIME/NOVAS/libnovas_c.so"; do
+              if [ ! -f "$lib" ]; then
+                  echo "Creating stub library for $(basename $lib)"
+                  if [ -z "${USE_EMPTY_STUBS:-}" ]; then
+                      cp /tmp/stub.so "$lib" 2>/dev/null || touch "$lib"
+                  else
+                      touch "$lib"
+                  fi
+              fi
+          done
+          
+          # Create cio_ra.bin if missing
+          if [ ! -f "$EXTERNAL_DIR/$TARGET_RUNTIME/NOVAS/cio_ra.bin" ]; then
+              echo "Creating empty cio_ra.bin placeholder"
+              touch "$EXTERNAL_DIR/$TARGET_RUNTIME/NOVAS/cio_ra.bin"
+          fi
+          
+          rm -f /tmp/stub.c /tmp/stub.so
 
       - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@v4

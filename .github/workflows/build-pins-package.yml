@@ -77,7 +77,13 @@ jobs:
             (cd "$unzip_dir" && find . -mindepth 1 -maxdepth 2 -print | head -n 50) >&2
             exit 1
           fi
-
+          
+          # Copy linux-x64 to linux-amd64 before copying
+          if [ -d "$unzip_dir/external/linux-x64" ]; then
+            cp -r "$unzip_dir/external/linux-x64" "$unzip_dir/external/linux-amd64"
+            echo "Renamed linux-x64 to linux-amd64"
+          fi
+          
           rsync -a "$unzip_dir/external/" "NINA/External/"
           echo "External bundle extracted into NINA/External"
 
@@ -93,7 +99,8 @@ jobs:
 
       - name: Restore linux-x64 dependencies
         run: |
-          dotnet restore NINA/NINA.csproj -r ${{ env.TARGET_RUNTIME }}
+          #dotnet restore NINA/NINA.csproj -r ${{ env.TARGET_RUNTIME }}
+          dotnet restore NINA/NINA.csproj -r linux-amd64
           dotnet restore System.Windows.Compat/System.Windows.Compat.csproj
 
       - name: Build System.Windows.Compat

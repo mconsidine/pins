@@ -100,10 +100,12 @@ jobs:
         run: dotnet build System.Windows.Compat/System.Windows.Compat.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-restore
 
       - name: Build linux-x64 binaries
-        run: dotnet build NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r ${{ env.TARGET_RUNTIME }} --no-restore
+        #run: dotnet build NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r ${{ env.TARGET_RUNTIME }} --no-restore
+        run: dotnet build NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r linux-amd64 --no-restore
 
       - name: Publish linux-x64 payload
-        run: dotnet publish NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r ${{ env.TARGET_RUNTIME }} --no-build -o ${{ env.PUBLISH_DIRECTORY }}/${{ env.TARGET_RUNTIME }}
+        #run: dotnet publish NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r ${{ env.TARGET_RUNTIME }} --no-build -o ${{ env.PUBLISH_DIRECTORY }}/${{ env.TARGET_RUNTIME }}
+        run: dotnet publish NINA/NINA.csproj -c ${{ env.BUILD_CONFIGURATION }} -r linux-amd64 --no-build -o ${{ env.PUBLISH_DIRECTORY }}/${{ env.TARGET_RUNTIME }}
 
       - name: Determine package version
         id: version
